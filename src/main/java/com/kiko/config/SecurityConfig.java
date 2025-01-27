@@ -1,5 +1,7 @@
 package com.kiko.config;
 
+import com.kiko.exceptions.CustomAccessDeniedHandler;
+import com.kiko.exceptions.CustomBesicAuthenticationEntryPoint;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,21 +30,24 @@ public class SecurityConfig {
         /*http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll());*/
         /*http.authorizeHttpRequests((requests) -> requests.anyRequest().denyAll());*/
 
-        http.authorizeHttpRequests((requests) ->
+        http
+//                .requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) only HTTPS
+                .authorizeHttpRequests(requests ->
                 requests.requestMatchers("/account","/balance","/cards","/loans").authenticated()
                         .requestMatchers("/notices","contact","/error").permitAll());
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+        http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBesicAuthenticationEntryPoint()));
+        http.exceptionHandling(ehc-> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(DataSource dataSource){
+//    @Bean
+//    public UserDetailsService userDetailsService(DataSource dataSource){
 //       UserDetails user = User.withUsername("kiko").password("{bcrypt}$2a$12$b4XwxzRucV/02kco/fQvM./Qbtdo9gTX7ABnZczoYL5H7mBBqv1B2").authorities("READ").build();
 //        UserDetails admin = User.withUsername("admin").password("{bcrypt}$2a$12$.VwvOKvHIRrE0ydCA4IYa.8QvU40.oRaXExdJ966RAnq1d.DpGJCy").authorities("ADMIN").build();
 //        return new InMemoryUserDetailsManager(user,admin);
-        return new JdbcUserDetailsManager(dataSource);
-    }
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
