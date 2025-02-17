@@ -33,8 +33,8 @@ public class SecurityConfig {
         http
 //                .requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) only HTTPS
                 .authorizeHttpRequests(requests ->
-                requests.requestMatchers("/account","/balance","/cards","/loans").authenticated()
-                        .requestMatchers("/notices","contact","/error").permitAll());
+                requests.requestMatchers("/account","/balance","/cards","/loans","/user").authenticated()
+                        .requestMatchers("/notices","contact","/error","/register").permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBesicAuthenticationEntryPoint()));
         http.exceptionHandling(ehc-> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
