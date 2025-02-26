@@ -1,7 +1,5 @@
 package com.kiko.config;
 
-import com.kiko.config.filters.JWTTokenGeneratorFilter;
-import com.kiko.config.filters.JWTTokenValidatorFilter;
 import com.kiko.events.CsrfCookieFilter;
 import com.kiko.exceptions.CustomAccessDeniedHandler;
 import com.kiko.exceptions.CustomBesicAuthenticationEntryPoint;
@@ -12,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -54,8 +50,6 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/contact","/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
                 .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
@@ -71,18 +65,5 @@ public class SecurityConfig {
         http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBesicAuthenticationEntryPoint()));
         http.exceptionHandling(ehc-> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
-    }
-
-//    @Bean
-//    public UserDetailsService userDetailsService(DataSource dataSource){
-//       UserDetails user = User.withUsername("kiko").password("{bcrypt}$2a$12$b4XwxzRucV/02kco/fQvM./Qbtdo9gTX7ABnZczoYL5H7mBBqv1B2").authorities("READ").build();
-//        UserDetails admin = User.withUsername("admin").password("{bcrypt}$2a$12$.VwvOKvHIRrE0ydCA4IYa.8QvU40.oRaXExdJ966RAnq1d.DpGJCy").authorities("ADMIN").build();
-//        return new InMemoryUserDetailsManager(user,admin);
-//        return new JdbcUserDetailsManager(dataSource);
-//    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
